@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+option java_multiple_files = true;
+option java_package = "cs236351.controller";
+//option java_outer_classname = "PaxosProtocol";
+
+package cs236351.controller;
+
+service TransactionManagerService {
+    rpc grpc_add_new_tr(Tr) returns (google.protobuf.Empty) {}
+    rpc grpc_add_transaction(TrTx) returns (google.protobuf.Empty) {}
+    rpc grpc_follower_remove_UTxO_from_sender(RemoveUTxO) returns (google.protobuf.Empty) {}
+    rpc grpc_follower_add_new_tr(UTxO) returns (google.protobuf.Empty) {}
+    rpc grpc_follower_add_sender_transaction(Tx) returns (google.protobuf.Empty) {}
+    rpc grpc_follower_add_tr_transaction(TrTx) returns (google.protobuf.Empty) {}
+
+    rpc grpcGetRemoteUnspent(Address) returns (UTxOList) {}
+    rpc grpcGetRemoteTxList(Address) returns (TxList) {}
+    rpc grpcGetRemoteAllTxList(google.protobuf.Empty) returns (TxList) {}
+    rpc grpcNewRemoteTransaction(TxRequest) returns (google.protobuf.Empty) {}
+    rpc grpcRemoteSendAmount(Tr) returns (google.protobuf.Empty) {}
+    rpc grpcRemoteLockAndValidateUtxos(TxRequest) returns (Tx) {}
+    rpc grpcRemoteCommitTx(Tx) returns (google.protobuf.Empty) {}
+    rpc grpcFollowerLockUtxo(TxRequest) returns (google.protobuf.Empty) {}
+}
+
+service TimeStampManagerService {
+    rpc grpcGetTimeStamp(google.protobuf.Empty) returns (TimeStamp) {}
+    rpc grpcUpdateTimeStamp(TimeStamp) returns (google.protobuf.Empty) {}
+}
+
+message TimeStamp {
+    uint64 timestamp = 1;
+}
+
+message Address {
+    string address = 1;
+}
+
+message TrTx {
+    Tr tr = 1;
+    Tx tx = 2;
+}
+
+message RemoveUTxO {
+    string sender = 1;
+    repeated UTxO UTxOList = 2;
+}
+
+message Tr {
+    string address = 1;
+    uint64 coins = 2;
+    string sender = 3;
+}
+
+message UTxO {
+    string tx_id = 1;
+    string address = 2;
+    uint64 coins = 3;
+}
+
+message UTxOList {
+    repeated UTxO utxo_list = 1;
+}
+
+message Tx {
+    string sender = 1;
+    repeated UTxO utxo_list = 2;
+    repeated Tr tr_list = 3;
+    string tx_id = 4;
+    uint64 timestamp = 5;
+}
+
+message TxList {
+    repeated Tx tx_list = 1;
+}
+
+message TxRequest {
+    string sender = 1;
+    repeated string utxo_id = 2;
+    repeated string tr_list = 3;
+    repeated uint64 coins = 4;
+}
+
+message TxRequests {
+    repeated TxRequest tx = 1;
+}
+
+message Configuration {
+  string shard = 1;
+}

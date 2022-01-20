@@ -1,0 +1,60 @@
+version: "3.9"
+services:
+  zookeeper1:
+    image: docker.io/bitnami/zookeeper:3.7
+    hostname: zoo1.zk.local
+    ports:
+      - 2181:2181
+    networks:
+      - zoo_net
+    environment:
+      - ZOO_SERVER_ID=1
+      - ALLOW_ANONYMOUS_LOGIN=yes
+      - ZOO_SERVERS=zoo1.zk.local:2888:3888
+
+  service1:
+    build: .
+    depends_on:
+      - zookeeper1
+    ports:
+      - "10000:8080"
+    networks:
+      - zoo_net
+    environment:
+      - CONF_FILE=/home/configuration/conf1.json
+
+  service2:
+    build: .
+    depends_on:
+      - service1
+    networks:
+      - zoo_net
+    ports:
+      - "10001:8080"
+    environment:
+      - CONF_FILE=/home/configuration/conf2.json
+
+  service3:
+    build: .
+    depends_on:
+      - service1
+    networks:
+      - zoo_net
+    ports:
+      - "10002:8080"
+    environment:
+      - CONF_FILE=/home/configuration/conf3.json
+
+  service4:
+    build: .
+    depends_on:
+      - service1
+    networks:
+      - zoo_net
+    ports:
+      - "10004:8080"
+    environment:
+      - CONF_FILE=/home/configuration/conf4.json
+
+networks:
+  zoo_net:
